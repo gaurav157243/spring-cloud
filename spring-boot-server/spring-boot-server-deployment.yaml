@@ -1,0 +1,56 @@
+# Step1 - create a docker image and push to docker hub or to local minikute repository
+# Step2 - create a deployment yaml file with the Deplyment Object. this will create a replica set and also the required pods which will have containers running.
+# Step3 - create a service yaml file to access the pods within or outside of the k8s cluster.
+
+
+# to access the service which is exposed by the deployment, get the ip addrerss of the minikube
+# minikube ip
+
+# http://192.168.99.101:30080/server/getData
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: boot-server # deployment doesnt have any labels; the pod template does
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: boot-server
+      version: "1.0"
+  template:  # this is the pod template
+    metadata:
+      #name: boot-server
+      labels:
+        app: boot-server
+        version: "1.0"
+    spec:    
+      containers: 
+      - name: boot-server
+        image: minikubedocker/spring-boot-server
+        # this policy will use the docker image from the local minikube docker policy
+        # to use minikube's docker use the following command: eval $(minikube docker-env)
+        imagePullPolicy: Never 
+
+---
+# in the same yaml file, we can provide multiple files seperated by ---
+# service yaml file - this will create the service which will tie all the pods together
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: boot-server-service # most important - this will be used to find your service
+spec: 
+  # the selector defines which pods are represented by this service
+  selector: # define the labels which are defined by your pod
+    app: boot-server
+    version: "1.0"
+  
+  ports:  
+    - name: http
+      port: 80 # The port that will be exposed by this service.
+      targetPort: 9080 # Number or name of the port to access on the pods targeted by the service
+      
+      nodePort: 30080 # The port on each node on which this service is exposed when type=NodePort or LoadBalancer
+      
+  type: NodePort # NodePort - exposed outside of the cluser; ClusterIp - private service ; within the cluster 
