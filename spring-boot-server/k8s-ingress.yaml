@@ -1,0 +1,87 @@
+# $ kubectl.exe  get ingress --all-namespaces
+# NAME         CLASS    HOSTS   ADDRESS          PORTS   AGE
+# my-ingress   <none>   *       192.168.99.100   80      139m
+
+# AzureAD+GauravAgrawal@LAPTOP-L9DA3ROL MINGW64 ~/code/spring-cloud/spring-boot-server (master)
+# $ kubectl.exe describe ingress my-ingress
+# Name:             my-ingress
+# Namespace:        default
+# Address:          192.168.99.100
+# Default backend:  default-http-backend:80 (<error: endpoints "default-http-backend" not found>)
+# Rules:
+#   Host        Path  Backends
+#   ----        ----  --------
+#   *
+#               /   boot-server-service:80 (172.17.0.4:9080,172.17.0.7:9080)
+# Annotations:  Events:
+#   Type        Reason  Age                 From                      Message
+#   ----        ------  ----                ----                      -------
+#   Normal      CREATE  139m                nginx-ingress-controller  Ingress default/my-ingress
+#   Normal      UPDATE  10m (x3 over 139m)  nginx-ingress-controller  Ingress default/my-ingress
+
+# AzureAD+GauravAgrawal@LAPTOP-L9DA3ROL MINGW64 ~/code/spring-cloud/spring-boot-server (master)
+# $
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api-service1
+        backend:
+          serviceName: boot-server-service
+          servicePort: 80
+  # we can add a different service below with a different path and redirect the same to a seperate k8s service
+  - http:
+      paths:
+      - path: /api-service2
+        backend:
+          serviceName: spring-boot-service2
+          servicePort: 81
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kong-ingress
+  annotations:
+    kubernetes.io/ingress.class: "kong"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api-service1
+        backend:
+          serviceName: boot-server-service
+          servicePort: 80
+  # we can add a different service below with a different path and redirect the same to a seperate k8s service
+  - http:
+      paths:
+      - path: /api-service2
+        backend:
+          serviceName: spring-boot-service2
+          servicePort: 81
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: app-name
+#   annotations:
+#     kubernetes.io/ingress.class: "kong"
+# spec:
+#   rules:
+#     - host:
+#       http:
+#         paths:
+#           - path: "/billing/\\S+/details"
+#             backend:
+#               serviceName: app-name
+#               servicePort: 443
+#           - path: "/checksense"
+#             backend:
+#               serviceName: app-name
+#               servicePort: 443
+
+

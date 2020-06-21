@@ -1,0 +1,14 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: service1-config-map
+data:
+  SERVER_SERVLET_CONTEXT_PATH: /api-service1
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: service2-config-map
+data:
+  SERVER_SERVLET_CONTEXT_PATH: /api-service2

@@ -1,0 +1,37 @@
+---
+# in the same yaml file, we can provide multiple files seperated by ---
+# service yaml file - this will create the service which will tie all the pods together
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: boot-server-service # most important - this will be used to find your service
+spec: 
+  # the selector defines which pods are represented by this service
+  selector: # define the labels which are defined by your pod
+    app: boot-server
+    version: "1.0"
+  
+  ports:  
+    - name: http
+      port: 80 # The port that will be exposed by this service.
+      targetPort: 9080 # Number or name of the port to access on the pods targeted by the service
+      
+      nodePort: 30080 # The port on each node on which this service is exposed when type=NodePort or LoadBalancer
+      
+  type: NodePort # NodePort - exposed outside of the cluser; ClusterIp - private service ; within the cluster 
+
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: spring-boot-service2
+spec:
+  type: NodePort
+  selector:
+    app: spring-boot-service2
+    version: "1.0"
+  ports: 
+  - port: 81
+    nodePort: 30081
+    targetPort: 9080
