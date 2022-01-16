@@ -1,0 +1,18 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: api-gateway-server
+  cloud:
+    gateway:
+#      default-filters:
+#      - name: CustomFilter
+      routes:
+      - id: trains-service 
+        #uri: http://localhost:10002/ # destination url 
+        uri: lb://test-app-2 # in case of using eureka discovery server
+        predicates: #  matching criteria
+        - Path=/trains/**
+        filters:
+        - LogRequestFilter
